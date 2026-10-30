@@ -8,7 +8,9 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.1.0
 Depends: 
     R (>= 3.5)
 LazyData: true
+Imports: 
+    dplyr
+Config/roxygen2/version: 8.1.0
