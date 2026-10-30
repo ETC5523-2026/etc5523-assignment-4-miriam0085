@@ -1,11 +1,14 @@
 Package: shaderange
-Title: What the Package Does (One Line, Title Case)
+Title: Explore Foundation Shade Supply Across the Lightness Range
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Miriam", "Wu", , "mwuu0085@student.monash.edu", role = c("aut", "cre"))
+Description: 
+    Provides foundation shade data from Sephora and Ulta, with
+    each shade's colour summarised by its lightness. Includes a function
+    for summarising shade supply by lightness band, and a Shiny app that
+    helps beauty product strategists see where shade options are thin.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends: 
