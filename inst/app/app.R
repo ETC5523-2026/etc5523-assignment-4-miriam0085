@@ -23,6 +23,7 @@ band_of <- function(lightness, breaks) {
 ui <- page_sidebar(
   title = "Foundation shade supply",
   theme = app_theme,
+  fillable = FALSE,
   sidebar = sidebar(
     width = 300,
     selectInput("brand", "Your brand",
@@ -30,8 +31,19 @@ ui <- page_sidebar(
     checkboxGroupInput("retailer", "Retailer",
                        choices = c("Sephora", "Ulta"),
                        selected = c("Sephora", "Ulta")),
-    sliderInput("breaks", "Lightness cut-offs (deep | medium | light)",
-                min = 0.20, max = 0.90, value = c(0.45, 0.70), step = 0.01)
+       accordion(
+      open = FALSE,
+      accordion_panel(
+        "Adjust shade bands",
+        sliderInput("breaks", "Deep ends · Light begins",
+                    min = 0.20, max = 0.90, value = c(0.45, 0.70),
+                    step = 0.01),
+        p(class = "small text-muted",
+          "Shades darker than the left handle count as deep; lighter than ",
+          "the right handle count as light. Move them to check whether a ",
+          "gap still holds under a different definition.")
+      )
+    )
   ),
   layout_columns(
     value_box(title = "Your shades", value = textOutput("n_shades")),
@@ -124,8 +136,17 @@ server <- function(input, output, session) {
       ggplot2::labs(x = "Lightness (0 = black, 1 = white)",
                     y = "Share of shades (density)", colour = NULL) +
       ggplot2::theme_minimal(base_size = 13) +
-      ggplot2::theme(legend.position = "top")
-  })
+      ggplot2::theme(
+        legend.position = "top",
+        plot.background = ggplot2::element_rect(fill = "transparent",
+                                                colour = NA),
+        panel.background = ggplot2::element_rect(fill = "transparent",
+                                                 colour = NA),
+        legend.background = ggplot2::element_rect(fill = "transparent",
+                                                  colour = NA),
+        legend.key = ggplot2::element_rect(fill = "transparent",
+                                           colour = NA))
+  }, bg = "transparent")
 
   output$gap_table <- renderTable({
     g <- gaps()
