@@ -8,7 +8,7 @@ brand_choices <- sort(unique(foundation_shades$brand))
 # One sans-serif font for everything; serif only for the question
 app_theme <- bs_theme(
   version = 5,
-  bg = "#F7F4EF", fg = "#1F1D1B", primary = "#8A4B32",
+  bg = "#F7F4EF", fg = "#1F1D1B", primary = "#A33B57",
   base_font = font_google("Inter", wght = c(400, 600)),
   heading_font = font_google("Inter", wght = c(400, 600)),
   font_scale = 0.9,
@@ -37,6 +37,18 @@ app_css <- "
            --bs-table-striped-bg: transparent; }
   .table > :not(caption) > * > * { background-color: transparent; }
   .table th { font-weight: 400; color: #7A7066; white-space: nowrap; }
+      .table th { font-weight: 400; color: #7A7066; white-space: nowrap; }
+  .accent { width: 28px; height: 2px; background: #A33B57;
+            margin-bottom: .75rem; }
+  .bslib-sidebar-layout > .sidebar .control-label {
+    font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
+    color: #7A7066; }
+  .legend-item { font-size: .8rem; color: #7A7066; margin-left: 1rem;
+                 display: inline-flex; align-items: center; gap: .4rem; }
+  .legend-line { width: 18px; height: 2px; background: #A33B57;
+                 display: inline-block; }
+  .legend-area { width: 14px; height: 8px; background: #CEC7BE;
+                 display: inline-block; }
 "
 
 # Assign each shade to a band, using the same labels as shade_supply()
@@ -83,6 +95,7 @@ ui <- page_sidebar(
   ),
 
   # Who the app is for, the question, and the answer for this brand
+  div(class = "accent"),
   p(class = "text-muted small mb-1",
     "For product strategy managers planning their next foundation launch"),
   div(class = "question",
@@ -100,8 +113,12 @@ ui <- page_sidebar(
         span(class = "stat-value", textOutput("largest_gap", inline = TRUE)))
   ),
 
-  card(
-    card_header("Your brand vs the market"),
+    card(
+    card_header(
+      class = "d-flex justify-content-between align-items-center",
+      span("Your brand vs the market"),
+      uiOutput("plot_legend", inline = TRUE)
+    ),
     plotOutput("compare_plot", height = "300px")
   ),
   layout_columns(
@@ -171,7 +188,7 @@ server <- function(input, output, session) {
   output$takeaway <- renderUI({
     if (!has_data()) return(NULL)
     w <- worst()
-    pts <- abs(round(w$gap * 100))
+    pts <- abs(round(w$gap * 100, 1))
     n <- nrow(brand_shades())
 
     message <- if (w$gap > gap_threshold) {
@@ -210,43 +227,75 @@ server <- function(input, output, session) {
     if (!has_data()) return("–")
     w <- worst()
     if (w$gap > gap_threshold) return("None")
-    paste0(w$band, " ", sprintf("%+.0f", w$gap * 100), " pts")
+    paste0(w$band, " ", sprintf("%+.1f", w$gap * 100), " pts")
+  })
+
+     # A simple legend in the card header: a line for the brand, a block for
+  # the market
+  output$plot_legend <- renderUI({
+    if (!has_data()) return(NULL)
+    div(
+      class = "d-flex align-items-center",
+      span(class = "legend-item", span(class = "legend-line"), input$brand),
+      span(class = "legend-item", span(class = "legend-area"), "Market")
+    )
   })
 
   output$compare_plot <- renderPlot({
     brand_data <- brand_shades()  # run the checks before building the plot
-    plot_data <- rbind(
-      data.frame(group = "Market", lightness = market()$lightness),
-      data.frame(group = "Your brand", lightness = brand_data$lightness)
+    b <- input$breaks
+
+    # Background bands: clearly darker fill for darker shades
+    bands <- data.frame(
+      xmin = c(0, b[1], b[2]),
+      xmax = c(b[1], b[2], 1),
+      label = c("Deep", "Medium", "Light"),
+      fill = c("#E2DDD6", "#ECE8E2", "#F4F2EE")
     )
+
     note <- if (nrow(brand_data) < 2) {
       "Too few shades to draw a curve for your brand."
     }
-    ggplot2::ggplot(plot_data,
-                    ggplot2::aes(lightness, colour = group)) +
-      ggplot2::geom_density(linewidth = 1) +
-      ggplot2::geom_vline(xintercept = input$breaks,
-                          linetype = "dashed", colour = "#7A7066") +
-      ggplot2::scale_colour_manual(
-        values = c("Market" = "#B9AFA4", "Your brand" = "#8A4B32")
+
+    ggplot2::ggplot() +
+      ggplot2::geom_rect(
+        data = bands,
+        ggplot2::aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+        fill = bands$fill
       ) +
+      # Thin white dividers between bands
+      ggplot2::geom_vline(xintercept = b, colour = "white", linewidth = 0.8) +
+      ggplot2::geom_text(
+        data = bands,
+        ggplot2::aes(x = (xmin + xmax) / 2, y = Inf, label = label),
+        vjust = 1.8, size = 4.2, colour = "#7A7066"
+      ) +
+      # Market as a soft filled area in the background
+      ggplot2::geom_density(
+        data = market(), ggplot2::aes(lightness),
+        fill = "#CEC7BE", colour = NA, alpha = 0.8
+      ) +
+      # The selected brand as the main line
+      ggplot2::geom_density(
+        data = brand_data, ggplot2::aes(lightness),
+        colour = "#A33B57", linewidth = 1.0
+      ) +
+      ggplot2::scale_x_continuous(breaks = c(0.25, 0.5, 0.75),
+                                  expand = c(0, 0)) +
+      ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.2))) +
+      ggplot2::coord_cartesian(xlim = c(0.12, 1)) +
       ggplot2::labs(x = "Lightness (0 = black, 1 = white)",
-                    y = "Share of shades", colour = NULL,
-                    caption = note) +
-      ggplot2::theme_minimal(base_size = 12) +
+                    y = "Share of shades", caption = note) +
+      ggplot2::theme_minimal(base_size = 14) +
       ggplot2::theme(
-        legend.position = "top",
-        legend.justification = "left",
         axis.text.y = ggplot2::element_blank(),
-        panel.grid.minor = ggplot2::element_blank(),
+        axis.text.x = ggplot2::element_text(colour = "#7A7066"),
+        axis.title = ggplot2::element_text(colour = "#7A7066", size = 11),
+        panel.grid = ggplot2::element_blank(),
         plot.background = ggplot2::element_rect(fill = "transparent",
                                                 colour = NA),
         panel.background = ggplot2::element_rect(fill = "transparent",
-                                                 colour = NA),
-        legend.background = ggplot2::element_rect(fill = "transparent",
-                                                  colour = NA),
-        legend.key = ggplot2::element_rect(fill = "transparent",
-                                           colour = NA)
+                                                 colour = NA)
       )
   }, bg = "transparent")
 
