@@ -11,16 +11,25 @@ app_theme <- bs_theme(
   bg = "#F7F4EF", fg = "#1F1D1B", primary = "#A33B57",
   base_font = font_google("Inter", wght = c(400, 600)),
   heading_font = font_google("Inter", wght = c(400, 600)),
-  font_scale = 0.9,
+  font_scale = 1,
   "border-radius" = "4px"
 )
 
 # Custom styles, added directly to the page
 app_css <- "
-  .bslib-page-title, .navbar-brand { font-family: Inter, sans-serif;
-                                     font-weight: 400; font-size: 1rem; }
+  /* ---- Page title: spaced capitals, like a wordmark ---- */
+  .bslib-page-title, .navbar-brand {
+    font-family: Inter, sans-serif; font-weight: 400; font-size: .8rem;
+    letter-spacing: .22em; text-transform: uppercase; color: #1F1D1B; }
+
+  /* ---- Header area ---- */
+  .accent { width: 28px; height: 2px; background: #A33B57;
+            margin-bottom: .75rem; }
+  .eyebrow { font-size: .72rem; letter-spacing: .12em;
+             text-transform: uppercase; color: #7A7066;
+             margin-bottom: .35rem; }
   .question { font-family: 'Cormorant Garamond', Georgia, serif;
-              font-size: 1.4rem; line-height: 1.25; margin-bottom: .5rem; }
+              font-size: 1.4rem; line-height: 1.25; margin-bottom: 1rem; }
   .takeaway { font-size: 1rem; font-weight: 600; margin-bottom: .25rem; }
   .caution  { color: #9A5B00; font-size: .85rem; }
   .stat-strip { display: flex; gap: 2rem; padding: .6rem 0;
@@ -28,27 +37,43 @@ app_css <- "
                 border-bottom: 1px solid #D8CFC4; margin: .75rem 0 1rem; }
   .stat-label { color: #7A7066; font-size: .85rem; margin-right: .4rem; }
   .stat-value { font-weight: 600; font-variant-numeric: tabular-nums; }
-  .card { background: #FFFDF9; border-color: #E4DBD0; }
+
+  /* ---- Labels: one style for sidebar, card and section titles ---- */
+  .bslib-sidebar-layout > .sidebar .control-label,
+  .bslib-card .card-header,
+  .accordion-button {
+    font-size: .78rem !important; font-weight: 400 !important;
+    letter-spacing: .12em; text-transform: uppercase; color: #7A7066; }
+
+  /* ---- Cards: hairline border, no shadow ---- */
+  .bslib-card { background: #FBF8F3; border: 1px solid #DCD3C8;
+                border-radius: 2px; box-shadow: none !important; }
   .bslib-card .card-header { background: transparent; border-bottom: none;
-                             font-weight: 400 !important; font-size: .9rem;
-                             color: #1F1D1B; }
+                             padding-bottom: 0; }
+  .bslib-card .card-body { padding-top: .5rem; }
+  .bslib-page-sidebar .main > .container-fluid,
+  .bslib-sidebar-layout > .main { max-width: 1200px; }
+
+  /* ---- Plot legend: keep brand names in their own case ---- */
+  .legend-item { font-size: .8rem; color: #7A7066; margin-left: 1rem;
+                 display: inline-flex; align-items: center; gap: .4rem;
+                 text-transform: none; letter-spacing: normal; }
+  .legend-line { width: 18px; height: 2px; background: #A33B57;
+                 display: inline-block; }
+  .legend-area { width: 14px; height: 8px; background: #CEC7BE;
+                 display: inline-block; }
+
+  /* ---- Tables ---- */
   .table { font-variant-numeric: tabular-nums;
            --bs-table-bg: transparent;
            --bs-table-striped-bg: transparent; }
   .table > :not(caption) > * > * { background-color: transparent; }
   .table th { font-weight: 400; color: #7A7066; white-space: nowrap; }
-      .table th { font-weight: 400; color: #7A7066; white-space: nowrap; }
-  .accent { width: 28px; height: 2px; background: #A33B57;
-            margin-bottom: .75rem; }
-  .bslib-sidebar-layout > .sidebar .control-label {
-    font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
-    color: #7A7066; }
-  .legend-item { font-size: .8rem; color: #7A7066; margin-left: 1rem;
-                 display: inline-flex; align-items: center; gap: .4rem; }
-  .legend-line { width: 18px; height: 2px; background: #A33B57;
-                 display: inline-block; }
-  .legend-area { width: 14px; height: 8px; background: #CEC7BE;
-                 display: inline-block; }
+  .gap-flag { color: #A33B57; font-weight: 600; }
+
+  /* ---- Notes section at the bottom ---- */
+  .notes li { margin-bottom: .4rem; font-size: .9rem; }
+  .text-muted { color: #7A7066 !important; }
 "
 
 # Assign each shade to a band, using the same labels as shade_supply()
@@ -96,7 +121,7 @@ ui <- page_sidebar(
 
   # Who the app is for, the question, and the answer for this brand
   div(class = "accent"),
-  p(class = "text-muted small mb-1",
+  p(class = "eyebrow",
     "For product strategy managers planning their next foundation launch"),
   div(class = "question",
       "Where is our foundation shade range thinner than the market?"),
@@ -264,10 +289,11 @@ server <- function(input, output, session) {
         fill = bands$fill
       ) +
       # Thin white dividers between bands
-      ggplot2::geom_vline(xintercept = b, colour = "white", linewidth = 0.8) +
+      ggplot2::geom_vline(xintercept = b, colour = "#FBF8F3", linewidth = 0.8) +
       ggplot2::geom_text(
         data = bands,
-        ggplot2::aes(x = (xmin + xmax) / 2, y = Inf, label = label),
+        ggplot2::aes(x = (pmax(xmin, 0.12) + xmax) / 2, y = Inf,
+                     label = label),
         vjust = 1.8, size = 4.2, colour = "#7A7066"
       ) +
       # Market as a soft filled area in the background
@@ -278,15 +304,15 @@ server <- function(input, output, session) {
       # The selected brand as the main line
       ggplot2::geom_density(
         data = brand_data, ggplot2::aes(lightness),
-        colour = "#A33B57", linewidth = 1.0
+        colour = "#A33B57", linewidth = 0.8
       ) +
       ggplot2::scale_x_continuous(breaks = c(0.25, 0.5, 0.75),
                                   expand = c(0, 0)) +
       ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.2))) +
       ggplot2::coord_cartesian(xlim = c(0.12, 1)) +
       ggplot2::labs(x = "Lightness (0 = black, 1 = white)",
-                    y = "Share of shades", caption = note) +
-      ggplot2::theme_minimal(base_size = 14) +
+                    y = NULL, caption = note) +
+      ggplot2::theme_minimal(base_size = 12) +
       ggplot2::theme(
         axis.text.y = ggplot2::element_blank(),
         axis.text.x = ggplot2::element_text(colour = "#7A7066"),
@@ -297,18 +323,27 @@ server <- function(input, output, session) {
         panel.background = ggplot2::element_rect(fill = "transparent",
                                                  colour = NA)
       )
-  }, bg = "transparent")
+  }, bg = "transparent", res = 96)
 
-  output$gap_table <- renderTable({
+    output$gap_table <- renderTable({
     g <- gaps()
+    gap_text <- sprintf("%+.1f", g$gap * 100)
+
+    # Highlight the weakest band, but only when the gap is meaningful
+    worst_row <- which.min(g$gap)
+    if (g$gap[worst_row] <= gap_threshold) {
+      gap_text[worst_row] <- paste0('<span class="gap-flag">',
+                                    gap_text[worst_row], '</span>')
+    }
+
     data.frame(
       Band = g$band,
       Yours = sprintf("%.1f%%", g$brand_share * 100),
       Market = sprintf("%.1f%%", g$market_share * 100),
-      `Gap (pts)` = sprintf("%+.1f", g$gap * 100),
+      `Gap (pts)` = gap_text,
       check.names = FALSE
     )
-  }, align = "lrrr")
+  }, align = "lrrr", sanitize.text.function = function(x) x)
 
    output$benchmark_title <- renderText({
     if (!has_data()) return("Benchmark products")
