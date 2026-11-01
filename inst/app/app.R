@@ -30,13 +30,14 @@ app_css <- "
              margin-bottom: .35rem; }
   .question { font-family: 'Cormorant Garamond', Georgia, serif;
               font-size: 1.4rem; line-height: 1.25; margin-bottom: 1rem; }
-  .takeaway { font-size: 1rem; font-weight: 600; margin-bottom: .25rem; }
+  .takeaway { font-size: .95rem; font-weight: 600; margin-bottom: .25rem; }
   .caution  { color: #9A5B00; font-size: .85rem; }
   .stat-strip { display: flex; gap: 2rem; padding: .6rem 0;
                 border-top: 1px solid #D8CFC4;
                 border-bottom: 1px solid #D8CFC4; margin: .75rem 0 1rem; }
   .stat-label { color: #7A7066; font-size: .85rem; margin-right: .4rem; }
-  .stat-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat-value { font-size: .9rem; font-weight: 600;
+                font-variant-numeric: tabular-nums; }
 
   /* ---- Labels: one style for sidebar, card and section titles ---- */
   .bslib-sidebar-layout > .sidebar .control-label,
@@ -44,6 +45,31 @@ app_css <- "
   .accordion-button {
     font-size: .78rem !important; font-weight: 400 !important;
     letter-spacing: .12em; text-transform: uppercase; color: #7A7066; }
+  .text-muted { color: #7A7066 !important; }
+
+  /* ---- Sidebar: spacing, collapse toggle and inputs ---- */
+  .bslib-sidebar-layout > .sidebar > .sidebar-content {
+    padding-top: 1rem !important; }
+  .bslib-sidebar-layout > .collapse-toggle { top: .9rem !important; }
+  .bslib-sidebar-layout > .collapse-toggle .collapse-icon {
+    width: .75rem !important; height: .75rem !important; opacity: .5; }
+  .bslib-sidebar-layout > .sidebar .control-label { margin-bottom: .5rem; }
+  .bslib-sidebar-layout > .sidebar .shiny-input-container label span,
+  .bslib-sidebar-layout > .sidebar .selectize-input,
+  .bslib-sidebar-layout > .sidebar .selectize-input input,
+  .bslib-sidebar-layout > .sidebar .selectize-dropdown {
+    font-size: .88rem !important; }
+  .bslib-sidebar-layout > .sidebar .selectize-input {
+    padding: .35rem .6rem !important; min-height: auto !important; }
+  .bslib-sidebar-layout > .sidebar input[type=checkbox] {
+    width: .85rem; height: .85rem; margin-top: .25rem; }
+  .bslib-sidebar-layout > .sidebar .irs-min,
+  .bslib-sidebar-layout > .sidebar .irs-max { display: none; }
+
+  /* ---- Accordion: quiet arrows and readable notes ---- */
+  .accordion-button::after {
+    width: .75rem; height: .75rem; background-size: .75rem; opacity: .5; }
+  .notes li { margin-bottom: .4rem; font-size: .9rem; }
 
   /* ---- Cards: hairline border, no shadow ---- */
   .bslib-card { background: #FBF8F3; border: 1px solid #DCD3C8;
@@ -53,6 +79,7 @@ app_css <- "
   .bslib-card .card-body { padding-top: .5rem; }
   .bslib-page-sidebar .main > .container-fluid,
   .bslib-sidebar-layout > .main { max-width: 1200px; }
+  .shiny-output-error-validation { font-size: .88rem; color: #7A7066; }
 
   /* ---- Plot legend: keep brand names in their own case ---- */
   .legend-item { font-size: .8rem; color: #7A7066; margin-left: 1rem;
@@ -69,11 +96,14 @@ app_css <- "
            --bs-table-striped-bg: transparent; }
   .table > :not(caption) > * > * { background-color: transparent; }
   .table th { font-weight: 400; color: #7A7066; white-space: nowrap; }
+  .bslib-card .table { font-size: .88rem; }
   .gap-flag { color: #A33B57; font-weight: 600; }
 
-  /* ---- Notes section at the bottom ---- */
-  .notes li { margin-bottom: .4rem; font-size: .9rem; }
-  .text-muted { color: #7A7066 !important; }
+  /* ---- Footer: data source ---- */
+  .source-note { border-top: 1px solid #D8CFC4; margin-top: 1.5rem;
+                 padding-top: .75rem; font-size: .8rem; color: #7A7066; }
+  .source-label { font-size: .72rem; letter-spacing: .12em;
+                  text-transform: uppercase; margin-right: .75rem; }
 "
 
 # Assign each shade to a band, using the same labels as shade_supply()
@@ -90,13 +120,14 @@ ui <- page_sidebar(
   title = "Foundation shade supply",
   theme = app_theme,
   fillable = FALSE,
-    tags$head(
+  tags$head(
     tags$link(
       rel = "stylesheet",
       href = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap"
     ),
     tags$style(HTML(app_css))
   ),
+
   sidebar = sidebar(
     width = 280,
     selectInput("brand", "Your brand",
@@ -104,17 +135,72 @@ ui <- page_sidebar(
     checkboxGroupInput("retailer", "Retailer",
                        choices = c("Sephora", "Ulta"),
                        selected = c("Sephora", "Ulta")),
+    sliderInput("breaks", "Shade bands",
+                min = 0.20, max = 0.90, value = c(0.45, 0.70),
+                step = 0.01, ticks = FALSE),
+    p(class = "small text-muted",
+      "0 = deepest, 1 = lightest. Deep ends at the left handle; ",
+      "light begins at the right."),
+
+    # Notes: how to use, how to read, and limitations
     accordion(
+      class = "notes",
       open = FALSE,
       accordion_panel(
-        "Adjust shade bands",
-        sliderInput("breaks", "Deep ends · Light begins",
-                    min = 0.20, max = 0.90, value = c(0.45, 0.70),
-                    step = 0.01),
-        p(class = "small text-muted",
-          "Shades darker than the left handle count as deep; lighter than ",
-          "the right handle count as light. Move them to check whether a ",
-          "gap still holds under a different definition.")
+        "How to use this app",
+        tags$ul(
+          tags$li(strong("Your brand"), br(),
+                  "Choose the brand you are planning for, and every ",
+                  "output updates to compare it with the market."),
+          tags$li(strong("Retailer"), br(),
+                  "Limit the market to Sephora, Ulta or both to see ",
+                  "whether a gap differs by channel."),
+          tags$li(strong("Shade bands (optional)"), br(),
+                  "Move the cut-offs to check whether a gap still holds ",
+                  "under a different definition of deep and light. The ",
+                  "defaults are 0.45 and 0.70.")
+        )
+      ),
+      accordion_panel(
+        "How to read the results",
+        tags$ul(
+          tags$li(strong("Your brand vs the market"), br(),
+                  "Each shade is one colour option within a foundation ",
+                  "product. The beige area shows how market shades spread ",
+                  "from deepest (0) to lightest (1), and the rose line ",
+                  "shows your brand. Where the line dips below the area, ",
+                  "your range is thinner than the market."),
+          tags$li(strong("Share of shades by band"), br(),
+                  "Yours and Market show the percentage of shades in each ",
+                  "band, and Gap is the difference between them in ",
+                  "percentage points. A band 5 or more points below the ",
+                  "market is a meaningful gap, which is highlighted in ",
+                  "rose and shown as the Largest gap above."),
+          tags$li(strong("Catch-up priority / Market opportunity"), br(),
+                  "If you have a meaningful gap, this table lists the ",
+                  "competitor products with the most shades in that band, ",
+                  "showing the range to catch up to. If your mix matches ",
+                  "the market, it lists the leaders in the band the whole ",
+                  "market supplies least, where you have a chance to ",
+                  "stand out.")
+        )
+      ),
+      accordion_panel(
+        "Limitations",
+        tags$ul(
+          tags$li("The data show which shades are offered, not which ones ",
+                  "sell, and every product counts equally. A thin band may ",
+                  "reflect low demand or unmet demand, so treat gaps as ",
+                  "leads for further research rather than launch ",
+                  "decisions."),
+          tags$li("Shades were collected from the Sephora and Ulta ",
+                  "websites in early 2021. Ranges may have changed since, ",
+                  "and other retailers are not included."),
+          tags$li("The band cut-offs and the 5-point threshold are ",
+                  "analytical choices rather than standards. Brands with ",
+                  "fewer than 10 shades are flagged because their shares ",
+                  "are unstable.")
+        )
       )
     )
   ),
@@ -138,7 +224,7 @@ ui <- page_sidebar(
         span(class = "stat-value", textOutput("largest_gap", inline = TRUE)))
   ),
 
-    card(
+  card(
     card_header(
       class = "d-flex justify-content-between align-items-center",
       span("Your brand vs the market"),
@@ -151,6 +237,13 @@ ui <- page_sidebar(
          tableOutput("gap_table")),
     card(card_header(textOutput("benchmark_title", inline = TRUE)),
          tableOutput("benchmark_table"))
+  ),
+
+  # Data source and licence, always visible at the foot of the page
+  div(
+    class = "source-note",
+    span(class = "source-label", "Source"),
+    "The Pudding, \"The Naked Truth\" (2021), via TidyTuesday. MIT licence."
   )
 )
 
@@ -208,7 +301,6 @@ server <- function(input, output, session) {
     }
   })
 
-
   # A one-sentence answer that changes with the selected brand
   output$takeaway <- renderUI({
     if (!has_data()) return(NULL)
@@ -227,7 +319,7 @@ server <- function(input, output, session) {
              tolower(w$band), " shades, ", pts, " points below the market.")
     }
 
-       tagList(
+    tagList(
       p(class = "takeaway", message),
       if (n < 10) {
         p(class = "caution",
@@ -255,7 +347,7 @@ server <- function(input, output, session) {
     paste0(w$band, " ", sprintf("%+.1f", w$gap * 100), " pts")
   })
 
-     # A simple legend in the card header: a line for the brand, a block for
+  # A simple legend in the card header: a line for the brand, a block for
   # the market
   output$plot_legend <- renderUI({
     if (!has_data()) return(NULL)
@@ -270,7 +362,7 @@ server <- function(input, output, session) {
     brand_data <- brand_shades()  # run the checks before building the plot
     b <- input$breaks
 
-    # Background bands: clearly darker fill for darker shades
+    # Background bands: darker fill for darker shades
     bands <- data.frame(
       xmin = c(0, b[1], b[2]),
       xmax = c(b[1], b[2], 1),
@@ -288,13 +380,14 @@ server <- function(input, output, session) {
         ggplot2::aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
         fill = bands$fill
       ) +
-      # Thin white dividers between bands
-      ggplot2::geom_vline(xintercept = b, colour = "#FBF8F3", linewidth = 0.8) +
+      # Thin dividers between bands
+      ggplot2::geom_vline(xintercept = b, colour = "#FBF8F3",
+                          linewidth = 0.8) +
       ggplot2::geom_text(
         data = bands,
         ggplot2::aes(x = (pmax(xmin, 0.12) + xmax) / 2, y = Inf,
                      label = label),
-        vjust = 1.8, size = 4.2, colour = "#7A7066"
+        vjust = 1.8, size = 3.4, colour = "#7A7066"
       ) +
       # Market as a soft filled area in the background
       ggplot2::geom_density(
@@ -308,10 +401,11 @@ server <- function(input, output, session) {
       ) +
       ggplot2::scale_x_continuous(breaks = c(0.25, 0.5, 0.75),
                                   expand = c(0, 0)) +
-      ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0, 0.2))) +
+      ggplot2::scale_y_continuous(
+        expand = ggplot2::expansion(mult = c(0, 0.2))
+      ) +
       ggplot2::coord_cartesian(xlim = c(0.12, 1)) +
-      ggplot2::labs(x = "Lightness (0 = black, 1 = white)",
-                    y = NULL, caption = note) +
+      ggplot2::labs(x = "Lightness", y = NULL, caption = note) +
       ggplot2::theme_minimal(base_size = 12) +
       ggplot2::theme(
         axis.text.y = ggplot2::element_blank(),
@@ -325,7 +419,7 @@ server <- function(input, output, session) {
       )
   }, bg = "transparent", res = 96)
 
-    output$gap_table <- renderTable({
+  output$gap_table <- renderTable({
     g <- gaps()
     gap_text <- sprintf("%+.1f", g$gap * 100)
 
@@ -340,12 +434,11 @@ server <- function(input, output, session) {
       Band = g$band,
       Yours = sprintf("%.1f%%", g$brand_share * 100),
       Market = sprintf("%.1f%%", g$market_share * 100),
-      `Gap (pts)` = gap_text,
-      check.names = FALSE
+      Gap = gap_text
     )
   }, align = "lrrr", sanitize.text.function = function(x) x)
 
-   output$benchmark_title <- renderText({
+  output$benchmark_title <- renderText({
     if (!has_data()) return("Benchmark products")
     f <- focus()
     band <- tolower(f$band)
@@ -358,7 +451,7 @@ server <- function(input, output, session) {
 
   output$benchmark_table <- renderTable({
     f <- focus()
-    out <- market() |>
+    market() |>
       dplyr::filter(brand != input$brand) |>
       dplyr::mutate(band = band_of(lightness, input$breaks)) |>
       dplyr::filter(band == f$band) |>
@@ -366,7 +459,6 @@ server <- function(input, output, session) {
       head(5) |>
       dplyr::transmute(`Competitor product` = paste(brand, "·", product),
                        Shades = n)
-    out
   }, align = "lr")
 }
 
