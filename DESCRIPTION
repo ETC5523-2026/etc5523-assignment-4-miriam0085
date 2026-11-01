@@ -1,13 +1,14 @@
 Package: shaderange
-Title: Explore Foundation Shade Supply Across the Lightness Range
+Title: Compare Foundation Shade Ranges with the Market
 Version: 0.0.0.9000
 Authors@R: 
     person("Miriam", "Wu", , "mwuu0085@student.monash.edu", role = c("aut", "cre"))
 Description: 
-    Provides foundation shade data from Sephora and Ulta, with
-    each shade's colour summarised by its lightness. Includes a function
-    for summarising shade supply by lightness band, and a Shiny app that
-    helps beauty product strategists see where shade options are thin.
+    Provides foundation shade data collected from Sephora and
+    Ulta, with functions for summarising shade supply by lightness band
+    and comparing a brand's shade mix with the market. Includes a Shiny
+    app that helps beauty product strategists find where a brand's shade
+    range is thin and which competitor products lead there.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

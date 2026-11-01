@@ -3,6 +3,7 @@
 export(brand_gaps)
 export(run_app)
 export(shade_supply)
+importFrom(bslib,bs_theme)
 importFrom(dplyr,
   group_by,
   if_else,
@@ -12,3 +13,4 @@ importFrom(dplyr,
   summarise,
   tibble
 )
+importFrom(ggplot2,ggplot)

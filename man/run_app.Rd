@@ -2,7 +2,7 @@
 % Please edit documentation in R/run-app.R
 \name{run_app}
 \alias{run_app}
-\title{Launch the foundation shade supply explorer}
+\title{Launch the foundation shade gap explorer}
 \usage{
 run_app()
 }
@@ -10,9 +10,10 @@ run_app()
 Called for its side effect of launching the app.
 }
 \description{
-Opens an interactive Shiny app that helps beauty product strategists
-explore how crowded each part of the foundation lightness range is,
-and which brands compete there.
+Opens an interactive Shiny app that helps beauty product strategy
+managers compare a brand's foundation shade range with the market,
+find the lightness bands where the brand is thinner than the market,
+and see which competitor products lead those bands.
 }
 \examples{
 if (interactive()) {
