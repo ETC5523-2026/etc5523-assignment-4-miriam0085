@@ -17,11 +17,12 @@ app_theme <- bs_theme(
 
 # Custom styles, added directly to the page
 app_css <- "
-  /* ---- Page title: spaced capitals, like a wordmark ---- */
+    /* ---- Page title: spaced serif capitals, like a wordmark ---- */
   .bslib-page-title, .navbar-brand {
-    font-family: Inter, sans-serif; font-weight: 400; font-size: .8rem;
-    letter-spacing: .22em; text-transform: uppercase; color: #1F1D1B; }
-
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+        font-size: 1.15rem; letter-spacing: .2em; word-spacing: .15em;
+    text-transform: uppercase;
+    color: #1F1D1B; padding: .35rem 0; }
   /* ---- Header area ---- */
   .accent { width: 28px; height: 2px; background: #A33B57;
             margin-bottom: .75rem; }
@@ -104,6 +105,7 @@ app_css <- "
                  padding-top: .75rem; font-size: .8rem; color: #7A7066; }
   .source-label { font-size: .72rem; letter-spacing: .12em;
                   text-transform: uppercase; margin-right: .75rem; }
+  .bslib-card .card-body { overflow: visible; }
 "
 
 # Assign each shade to a band, using the same labels as shade_supply()
@@ -117,7 +119,7 @@ gap_threshold <- -0.05
 
 # ---- UI ----
 ui <- page_sidebar(
-  title = "Foundation shade supply",
+  title = "Shade Gap Explorer",
   theme = app_theme,
   fillable = FALSE,
   tags$head(
@@ -150,13 +152,13 @@ ui <- page_sidebar(
         "How to use this app",
         tags$ul(
           tags$li(strong("Your brand"), br(),
-                  "Choose the brand you are planning for, and every ",
-                  "output updates to compare it with the market."),
+                  "Choose the brand you are planning for. The summary, chart and tables 
+                  then compare that brand with the whole market."),
           tags$li(strong("Retailer"), br(),
                   "Limit the market to Sephora, Ulta or both to see ",
                   "whether a gap differs by channel."),
           tags$li(strong("Shade bands (optional)"), br(),
-                  "Move the cut-offs to check whether a gap still holds ",
+                  "Move the two handles to check whether a gap still holds ",
                   "under a different definition of deep and light. The ",
                   "defaults are 0.45 and 0.70.")
         )
@@ -164,12 +166,16 @@ ui <- page_sidebar(
       accordion_panel(
         "How to read the results",
         tags$ul(
+          tags$li(strong("Summary"), br(),
+                  "The bold sentence summarises how your brand's shade mix ",
+                  "compares with the market. Below it, Shades and Products count 
+                  your brand's shades and products.A shade is one colour option 
+                  within a foundation product."),
           tags$li(strong("Your brand vs the market"), br(),
-                  "Each shade is one colour option within a foundation ",
-                  "product. The beige area shows how market shades spread ",
-                  "from deepest (0) to lightest (1), and the rose line ",
-                  "shows your brand. Where the line dips below the area, ",
-                  "your range is thinner than the market."),
+                  "The beige area shows how market shades spread from ",
+                  "deepest to lightest, and the rose line shows your brand. ",
+                  "Where the line dips below the area, your range is ",
+                  "thinner than the market."),
           tags$li(strong("Share of shades by band"), br(),
                   "Yours and Market show the percentage of shades in each ",
                   "band, and Gap is the difference between them in ",
@@ -188,12 +194,13 @@ ui <- page_sidebar(
       accordion_panel(
         "Limitations",
         tags$ul(
-          tags$li("The data show which shades are offered, not which ones ",
-                  "sell, and every product counts equally. A thin band may ",
-                  "reflect low demand or unmet demand, so treat gaps as ",
-                  "leads for further research rather than launch ",
-                  "decisions."),
-          tags$li("Shades were collected from the Sephora and Ulta ",
+          tags$li("The data cover only the foundation shades that brands ",
+                  "offer. They do not include sales, customer demand or ",
+                  "the skin tones of shoppers in each market. A thin band ",
+                  "may therefore mean low demand, or demand that brands ",
+                  "have not yet met, so treat gaps as leads for further ",
+                  "research rather than launch decisions."),
+          tags$li("Shades were collected from the US Sephora and Ulta ",
                   "websites in early 2021. Ranges may have changed since, ",
                   "and other retailers are not included."),
           tags$li("The band cut-offs and the 5-point threshold are ",
