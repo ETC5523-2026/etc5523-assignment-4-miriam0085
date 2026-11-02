@@ -169,7 +169,7 @@ ui <- page_sidebar(
           tags$li(strong("Summary"), br(),
                   "The bold sentence summarises how your brand's shade mix ",
                   "compares with the market. Below it, Shades and Products count 
-                  your brand's shades and products.A shade is one colour option 
+                  your brand's shades and products. A shade is one colour option 
                   within a foundation product."),
           tags$li(strong("Your brand vs the market"), br(),
                   "The beige area shows how market shades spread from ",
