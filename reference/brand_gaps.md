@@ -63,7 +63,8 @@ brand_gaps(foundation_shades, brand = "L'Oréal")
 #> 1 Deep             29       0.190        0.160  0.0297
 #> 2 Medium           72       0.471        0.457  0.0138
 #> 3 Light            52       0.340        0.383 -0.0435
-# Negative gaps show where L'Oréal's range is thinner than the market's
+# Negative gaps show where L'Oréal offers proportionally fewer shades
+# than the market
 
 brand_gaps(foundation_shades, brand = "FENTY BEAUTY by Rihanna")
 #> # A tibble: 3 × 5
