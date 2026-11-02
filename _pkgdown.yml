@@ -1,4 +1,14 @@
 url: https://etc5523-2026.github.io/etc5523-assignment-4-miriam0085/
 template:
   bootstrap: 5
-
+reference:
+- title: Analyse shade supply
+  contents:
+  - shade_supply
+  - brand_gaps
+- title: Launch the app
+  contents:
+  - run_app
+- title: Data
+  contents:
+  - foundation_shades

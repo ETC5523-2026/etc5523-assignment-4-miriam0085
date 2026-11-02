@@ -18,9 +18,10 @@ foundation_shades <- shades_raw |>
       stringr::str_remove("\\s*selected$") |>
       stringr::str_squish()
   ) |>
-  # Drop shades scraped twice; match on shade description, not hex,
-  # because distinct shades can share the same extracted hex code
+  # Drop shades scraped twice, matching on shade name rather than hex code
+  # because distinct shades can share the same hex code
   dplyr::distinct(brand, product, shade, .keep_all = TRUE) |>
+  # Keep only the fields package users need
   dplyr::select(brand, product, retailer, shade, hex, hue, sat, lightness) |>
   dplyr::arrange(brand, product, dplyr::desc(lightness))
 

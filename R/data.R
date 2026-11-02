@@ -1,21 +1,25 @@
 #' Foundation shades sold at Sephora and Ulta
 #'
-#' Foundation shades scraped from the Sephora and Ulta websites, with the
-#' colour of each shade's swatch summarised as HSL values. Each row is one
-#' shade of one product.
+#' Foundation shades listed on the Sephora and Ulta websites in early 2021.
+#' Each row is one shade of one product, with the colour of its swatch image
+#' summarised as hue, saturation and lightness (HSL). The data cover 6,774
+#' shades from 328 products across 107 brands.
 #'
 #' @format A data frame with 6,774 rows and 8 columns:
 #' \describe{
-#'   \item{brand}{Brand name}
+#'   \item{brand}{Brand of the foundation}
 #'   \item{product}{Product name}
-#'   \item{retailer}{Retailer the product was collected from: `"Sephora"`
-#'     or `"Ulta"`}
-#'   \item{shade}{Shade description as shown on the product page}
+#'   \item{retailer}{Retailer the product was listed on, `"Sephora"` or
+#'     `"Ulta"`, derived from the product URL}
+#'   \item{shade}{Shade description as shown on the product page, with
+#'     scraping artefacts removed}
 #'   \item{hex}{Hexadecimal code of the most prevalent colour in the
-#'     shade's swatch image}
-#'   \item{hue}{HSL hue, in degrees from 0 to 360}
-#'   \item{sat}{HSL saturation, from 0 to 1}
-#'   \item{lightness}{HSL lightness, from 0 (black) to 1 (white)}
+#'     shade's swatch image, such as `#4F322C`}
+#'   \item{hue}{HSL hue, in degrees around the colour wheel from 0 to 360}
+#'   \item{sat}{HSL saturation, the amount of grey in the colour, from 0
+#'     to 1}
+#'   \item{lightness}{HSL lightness, from 0 (black) to 1 (white); lower
+#'     values are deeper shades}
 #' }
 #' @details The data were collected in early 2021 and reflect the products
 #'   listed on each retailer's website at that time. Colour values come
