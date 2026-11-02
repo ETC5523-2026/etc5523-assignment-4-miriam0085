@@ -1,14 +1,12 @@
 # shaderange
 
-The shaderange package helps beauty product strategy managers find where
-their next foundation launch could stand out. It compares a brand’s
+The shaderange package helps beauty product strategy managers find
+opportunities for their next foundation launch. It compares a brand’s
 foundation shades with the whole market across two major US beauty
-retailers, Sephora and Ulta. The comparison shows where the brand offers
-a smaller share of deep, medium or light shades than the market, and
-which of these bands the whole market leaves thin. Depending on the
-result, it then lists the competitor products leading either the brand’s
-weakest band, as a benchmark to catch up to, or the market’s thinnest
-band, as a chance to stand out.
+retailers, Sephora and Ulta, showing where the brand offers a smaller
+share of deep, medium or light shades than the market. Based on the
+result, it also points to the competitor products worth benchmarking
+against.
 
 The package contains:
 
