@@ -36,7 +36,8 @@ fewer shades than the market.
 }
 \examples{
 brand_gaps(foundation_shades, brand = "L'Oréal")
-# Negative gaps show where L'Oréal's range is thinner than the market's
+# Negative gaps show where L'Oréal offers proportionally fewer shades
+# than the market
 
 brand_gaps(foundation_shades, brand = "FENTY BEAUTY by Rihanna")
 # Compare with a brand known for an inclusive shade range

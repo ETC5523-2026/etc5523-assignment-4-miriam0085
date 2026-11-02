@@ -44,8 +44,8 @@ run_app()
 ```
 
 Choose your brand and retailer in the sidebar. The app shows where your
-brand’s shade mix is thinner than the market and which competitor
-products lead those bands.
+brand offers a smaller share of deep, medium or light shades than the
+market, and which competitor products to benchmark against.
 
 ## Example
 

@@ -112,9 +112,14 @@ is where the app points to as an opportunity.
 
 ## Limitations
 
-The data show which shades are offered, not which ones sell, and every
-product counts equally. A thin band may reflect low demand or unmet demand,
-so treat gaps as leads for further research rather than launch decisions.
-The data are a snapshot from early 2021, so brands may have added or removed 
-shades since, and the results describe the market at that time rather than today. 
-The band cut-offs and 5-point threshold are analytical choices rather than standards.
+- The data cover only the foundation shades that brands offer. They do not
+  include sales, customer demand or the skin tones of shoppers in each
+  market. A thin band may therefore mean low demand, or demand that brands
+  have not yet met, so treat gaps as leads for further research rather than
+  launch decisions.
+- Shades were collected from the US Sephora and Ulta websites in early
+  2021. Ranges may have changed since, and other retailers are not
+  included.
+- The band cut-offs and the 5-point threshold are analytical choices rather
+  than standards. Brands with fewer than 10 shades are flagged because their
+  shares are unstable.

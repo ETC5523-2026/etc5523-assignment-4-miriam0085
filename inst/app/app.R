@@ -265,11 +265,16 @@ server <- function(input, output, session) {
 
   # Is there anything to compare under the current selection?
   has_data <- reactive({
-    length(input$retailer) > 0 && input$brand %in% market()$brand
+    length(input$retailer) > 0 && input$brand %in% market()$brand &&
+      input$breaks[1] < input$breaks[2]
   })
 
   # The selected brand's shades within that market
   brand_shades <- reactive({
+    validate(
+      need(input$breaks[1] < input$breaks[2],
+           "Move the two shade band handles apart so that each band covers a range.")
+    )
     validate(
       need(length(input$retailer) > 0,
            "Select at least one retailer to see results.")
