@@ -1,8 +1,9 @@
 # Summarise foundation shade supply by lightness band
 
 Splits foundation shades into deep, medium and light bands using
-lightness cut-offs, then counts how many shades and how many distinct
-products fall in each band. Use it to see where shade supply is thin.
+lightness cut-offs. For each band, it counts the shades and distinct
+products, their share of all shades, and the average number of shades
+per product offering the band. Use it to see where shade supply is thin.
 
 ## Usage
 

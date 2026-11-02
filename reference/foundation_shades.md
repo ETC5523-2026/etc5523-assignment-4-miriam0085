@@ -1,8 +1,9 @@
 # Foundation shades sold at Sephora and Ulta
 
-Foundation shades scraped from the Sephora and Ulta websites, with the
-colour of each shade's swatch summarised as HSL values. Each row is one
-shade of one product.
+Foundation shades listed on the Sephora and Ulta websites in early 2021.
+Each row is one shade of one product, with the colour of its swatch
+image summarised as hue, saturation and lightness (HSL). The data cover
+6,774 shades from 328 products across 107 brands.
 
 ## Usage
 
@@ -16,7 +17,7 @@ A data frame with 6,774 rows and 8 columns:
 
 - brand:
 
-  Brand name
+  Brand of the foundation
 
 - product:
 
@@ -24,28 +25,31 @@ A data frame with 6,774 rows and 8 columns:
 
 - retailer:
 
-  Retailer the product was collected from: `"Sephora"` or `"Ulta"`
+  Retailer the product was listed on, `"Sephora"` or `"Ulta"`, derived
+  from the product URL
 
 - shade:
 
-  Shade description as shown on the product page
+  Shade description as shown on the product page, with scraping
+  artefacts removed
 
 - hex:
 
   Hexadecimal code of the most prevalent colour in the shade's swatch
-  image
+  image, such as `#4F322C`
 
 - hue:
 
-  HSL hue, in degrees from 0 to 360
+  HSL hue, in degrees around the colour wheel from 0 to 360
 
 - sat:
 
-  HSL saturation, from 0 to 1
+  HSL saturation, the amount of grey in the colour, from 0 to 1
 
 - lightness:
 
-  HSL lightness, from 0 (black) to 1 (white)
+  HSL lightness, from 0 (black) to 1 (white); lower values are deeper
+  shades
 
 ## Source
 
